@@ -41,12 +41,14 @@ bundle_pattern() {
   esac
 }
 
-requested=("$@")
-if (( ${#requested[@]} == 0 )); then
-  patterns=("")
+# 인자가 없으면 전체. 있으면 번들 이름을 파일명 패턴으로 바꾼다.
+# 빈 문자열을 sentinel 로 쓰면 명령치환이 개행을 지워 파이썬 쪽에서 빈 리스트가
+# 되어 "전체"가 "아무것도"로 뒤집힌다. 그래서 명시적으로 ALL 을 쓴다.
+if (( $# == 0 )); then
+  patterns=("ALL")
 else
   patterns=()
-  for name in "${requested[@]}"; do patterns+=("$(bundle_pattern "$name")"); done
+  for name in "$@"; do patterns+=("$(bundle_pattern "$name")"); done
 fi
 
 mkdir -p "$DIST"
@@ -54,17 +56,19 @@ mkdir -p "$DIST"
 # 매니페스트에서 (파일명, sha256, 다운로드URL) 목록을 뽑는다.
 mapfile -t ROWS < <(
   MANIFEST="$MANIFEST" PATTERNS="$(printf '%s\n' "${patterns[@]}")" python3 <<'PY'
-import json, os
+import json, os, sys
 manifest = json.load(open(os.environ["MANIFEST"], encoding="utf-8"))
-patterns = [p for p in os.environ["PATTERNS"].splitlines()]
+patterns = [p for p in os.environ["PATTERNS"].splitlines() if p]
+take_all = "ALL" in patterns
 for archive in manifest.get("archives", []):
     name = archive["file"]
     if name == "SHA256SUMS":
         continue
-    if patterns != [""] and not any(p and p in name for p in patterns):
+    if not take_all and not any(p in name for p in patterns):
         continue
     url = archive.get("direct_download") or archive.get("share_link", "")
     if not url:
+        print(f"경고: {name} 에 다운로드 URL 이 없습니다.", file=sys.stderr)
         continue
     print(f"{name}\t{archive.get('sha256','')}\t{url}")
 PY

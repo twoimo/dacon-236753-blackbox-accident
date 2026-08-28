@@ -131,10 +131,13 @@ lines = [
     "| 아카이브 | 용량 | 공유 링크 | 직접 다운로드 |",
     "|---|---|---|---|",
 ]
+def human(n):
+    return f"{n / 1024**3:.2f} GiB" if n >= 1024**3 else f"{n / 1024**2:.1f} MiB"
+
 for e in entries:
     direct = f"[curl용]({e['direct_download']})" if e["direct_download"] else "-"
     lines.append(
-        f"| `{e['file']}` | {e['bytes'] / 1024**2:.1f} MiB "
+        f"| `{e['file']}` | {human(e['bytes'])} "
         f"| [열기]({e['share_link']}) | {direct} |"
     )
 lines += [
