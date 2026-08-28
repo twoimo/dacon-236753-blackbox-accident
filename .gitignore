@@ -1,0 +1,63 @@
+# ─── 대용량 데이터: 깃 대신 구글 드라이브로 배포 ────────────────────────────
+# 복원: bash scripts/fetch_data.sh   (링크 목록은 docs/07-dataset-distribution.md)
+
+# 외부 데이터셋 전체 (CCD 8.1GB, comma2k19 120MB + 자체 .git 포함)
+/data/external/
+
+# Stage 3 주행 영상 (37MB × 5). Stage 1·2 예제 영상은 작아서 저장소에 포함한다.
+/data/stage3/videos/
+
+# Stage 2 평가 레이아웃 프레임 이미지 (12MB). 영상에서 즉시 재생성 가능:
+#   make stage2-images
+/data/stage2/images/
+
+# 배포 아카이브
+/dist/
+
+# ─── 학습/추론 산출물 ────────────────────────────────────────────────────────
+/model/
+/output/
+/runs/
+/wandb/
+/checkpoints/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+submit.zip
+inference.py
+
+# ─── 파이썬 ─────────────────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ─── 운영체제 / 에디터 ──────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
+*.swo
+
+# ─── 비밀정보 (절대 커밋 금지) ──────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+client_secret*.json
+token.json
+rclone.conf

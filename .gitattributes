@@ -1,0 +1,40 @@
+# 줄바꿈 정규화 — 여러 OS 에서 워크트리를 쓰기 때문에 명시한다.
+* text=auto eol=lf
+
+*.py    text eol=lf
+*.sh    text eol=lf
+*.md    text eol=lf
+*.csv   text eol=lf
+*.json  text eol=lf
+*.txt   text eol=lf
+
+# 노트북은 diff 노이즈가 심하므로 병합 충돌 시 수동 처리한다.
+*.ipynb text eol=lf merge=binary linguist-language=Python
+
+# 바이너리 — diff/머지 시도 금지
+*.mp4   binary
+*.hevc  binary
+*.avi   binary
+*.mov   binary
+*.jpg   binary
+*.jpeg  binary
+*.png   binary
+*.zst   binary
+*.tar   binary
+*.zip   binary
+*.pt    binary
+*.pth   binary
+*.npy   binary
+*.npz   binary
+*.bz2   binary
+
+# 생성물임을 표시해 GitHub 언어 통계와 diff 기본 접힘에 반영한다.
+catalog/** linguist-generated=true
+docs/07-dataset-distribution.md linguist-generated=true
+
+# 대회 배포 원본은 바이트 단위로 보존한다. 줄바꿈 정규화도 하지 않는다.
+# (baseline/requirements.txt 는 CRLF 로 배포되었고, 그대로 두는 것이 맞다.)
+baseline/** -text
+data/stage1/labels.csv -text
+data/SOURCES.md -text
+

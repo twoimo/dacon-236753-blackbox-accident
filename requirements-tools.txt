@@ -1,0 +1,4 @@
+# 저장소 도구(카탈로그 생성·검증·라벨 파생)용 의존성.
+# 모델 학습·추론 의존성은 baseline/requirements.txt 를 따른다.
+numpy==2.4.6
+pillow==12.3.0

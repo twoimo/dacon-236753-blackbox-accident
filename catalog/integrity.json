@@ -1,0 +1,287 @@
+{
+  "generated_at": "2026-08-28T08:17:59+00:00",
+  "summary": {
+    "error": 1,
+    "warning": 2,
+    "info": 1,
+    "ok": 8
+  },
+  "findings": [
+    {
+      "severity": "ok",
+      "kind": "expected_duplicates",
+      "detail": "의도된 중복 8그룹 (삭제 대상 아님), 예상 밖 중복 0그룹",
+      "groups": {
+        "11400de54cd39aaaf96c9ec0a47566f15dc5db86166e4d620e5a53a341252662": {
+          "paths": [
+            "data/stage1/videos/original/000002.mp4",
+            "data/stage2/videos/000002.mp4"
+          ],
+          "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+        },
+        "37aa2954975cb3de5263edc5084d7fb10512db055d5eb5eaf226d0ef94c1c003": {
+          "paths": [
+            "data/stage1/videos/original/000003.mp4",
+            "data/stage2/videos/000003.mp4"
+          ],
+          "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+        },
+        "53d2a88becfc45f9dcb804f2f78436f2bb6246d80386ff18ded10af679d5d6f3": {
+          "paths": [
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/CAN/speed/t",
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/CAN/wheel_speed/t"
+          ],
+          "reason": "설계상 동일: comma2k19 센서들이 동일 클럭 타임스탬프 배열을 공유"
+        },
+        "6dd128290581bbd86f6998eb4fc4590c7e1300dab9eafc938ccd72a100b34bbb": {
+          "paths": [
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/magnetometer/t",
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/magnetometer_uncalibrated/t"
+          ],
+          "reason": "설계상 동일: comma2k19 센서들이 동일 클럭 타임스탬프 배열을 공유"
+        },
+        "877b6804d709acd31a8e7c4843590d674d3877fffab3d8c076332462787d2179": {
+          "paths": [
+            "data/stage1/videos/original/000001.mp4",
+            "data/stage2/videos/000001.mp4"
+          ],
+          "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+        },
+        "9753763c372b7bf2526a38fc60835dcab9cbe725ed984d1cb32a10c349fb0caf": {
+          "paths": [
+            "data/stage1/videos/original/000005.mp4",
+            "data/stage2/videos/000005.mp4"
+          ],
+          "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+        },
+        "9df28fe965d5936bb91a020b688e35304ee4b823e388cb814d077b1f934a8558": {
+          "paths": [
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/accelerometer/t",
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/gyro/t",
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/gyro_bias/t",
+            "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/gyro_uncalibrated/t"
+          ],
+          "reason": "설계상 동일: comma2k19 센서들이 동일 클럭 타임스탬프 배열을 공유"
+        },
+        "beeb68a9eeeccb610030fc06fd898551321532f1961eadc82ac5fe7ec893c93b": {
+          "paths": [
+            "data/stage1/videos/original/000004.mp4",
+            "data/stage2/videos/000004.mp4"
+          ],
+          "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+        }
+      }
+    },
+    {
+      "severity": "ok",
+      "kind": "stage1_class_collision",
+      "detail": "ORIGINAL 5건 / RERECORDED 5건 모두 내용 상이"
+    },
+    {
+      "severity": "ok",
+      "kind": "labels_present",
+      "detail": "data/stage1/labels.csv 존재"
+    },
+    {
+      "severity": "ok",
+      "kind": "labels_present",
+      "detail": "data/stage2/labels.csv 존재"
+    },
+    {
+      "severity": "error",
+      "kind": "labels_present",
+      "detail": "data/stage3/labels.csv 없음"
+    },
+    {
+      "severity": "ok",
+      "kind": "labels_reference_integrity",
+      "detail": "data/stage1/labels.csv 의 깨진 path 0건"
+    },
+    {
+      "severity": "ok",
+      "kind": "labels_reference_integrity",
+      "detail": "data/stage2/labels.csv 의 깨진 path 0건"
+    },
+    {
+      "severity": "warning",
+      "kind": "stage3_frame_rate_mismatch",
+      "detail": "공개 예제 Stage3 영상은 comma2k19 원본 그대로 20Hz(패킷 간격 0.05s)이고 컨테이너는 40/1 로 잘못 선언되어 있다. 대회 평가 스펙은 10Hz (1프레임 = 1 sample = 0.1s)이므로 학습·검증 시 반드시 리샘플링해야 한다. 또한 후반부 PTS 가 손상되어 컨테이너 duration 을 신뢰할 수 없다.",
+      "per_video": [
+        {
+          "path": "data/stage3/videos/OPEN_001.mp4",
+          "declared_r_frame_rate": "40/1",
+          "container_duration_s": "2.501150",
+          "decoded_frame_count": 1200
+        },
+        {
+          "path": "data/stage3/videos/OPEN_002.mp4",
+          "declared_r_frame_rate": "40/1",
+          "container_duration_s": "2.501151",
+          "decoded_frame_count": 1201
+        },
+        {
+          "path": "data/stage3/videos/OPEN_003.mp4",
+          "declared_r_frame_rate": "40/1",
+          "container_duration_s": "2.501147",
+          "decoded_frame_count": 1197
+        },
+        {
+          "path": "data/stage3/videos/OPEN_004.mp4",
+          "declared_r_frame_rate": "40/1",
+          "container_duration_s": "2.501147",
+          "decoded_frame_count": 1197
+        },
+        {
+          "path": "data/stage3/videos/OPEN_005.mp4",
+          "declared_r_frame_rate": "40/1",
+          "container_duration_s": "2.501147",
+          "decoded_frame_count": 1197
+        }
+      ]
+    },
+    {
+      "severity": "ok",
+      "kind": "crashbest_frame_contract",
+      "detail": "영상당 50프레임 계약 충족 (1500개 영상 / 75000장)"
+    },
+    {
+      "severity": "ok",
+      "kind": "crashbest_annotation_join",
+      "detail": "Crash_Table.csv 조인 커버리지 100.0000%"
+    },
+    {
+      "severity": "warning",
+      "kind": "crashbest_resolution_mix",
+      "detail": "해상도가 균일하지 않다. 주 해상도 1280x720 73,250장 외에 1,750장이 다른 해상도: {'960x720': 800, '640x360': 950}. 전처리에서 letterbox/pillarbox 를 고려하지 않으면 종횡비가 왜곡되고 Stage1 재녹화 판별에서 거짓 단서가 될 수 있다.",
+      "resolutions": {
+        "1280x720": 73250,
+        "960x720": 800,
+        "640x360": 950
+      }
+    },
+    {
+      "severity": "info",
+      "kind": "crashbest_consecutive_duplicates",
+      "detail": "동일 내용 프레임 8장 (6그룹). 원본 영상의 정지 구간에서 발생한 연속 프레임 중복이며 삭제하면 50프레임 계약이 깨진다. 유지 권장.",
+      "groups": {
+        "2fc70eedffc7cbe197d21bd32bd3c75b301462e7d8d19c64cf008114e2d27eca": [
+          "C_000989_43.jpg",
+          "C_000989_44.jpg",
+          "C_000989_45.jpg",
+          "C_000989_46.jpg"
+        ],
+        "5986ac1df6cac3d81cff80a3e9e2436cccd868ad5e0075bd9cc5f1d1f5738ab6": [
+          "C_000826_49.jpg",
+          "C_000826_50.jpg"
+        ],
+        "6bd9bc24240209b215b86f85f9bbdf010349f649dab76ba7b550e2d5e123f1a7": [
+          "C_000826_43.jpg",
+          "C_000826_44.jpg"
+        ],
+        "a19684c3cead12d4001ca502d3503b0df992f38671bb01e8f2093fa88ddfb52e": [
+          "C_001173_41.jpg",
+          "C_001173_42.jpg"
+        ],
+        "e91f044344e04ae20923f3e5ff3eff789b32c3784fbcc87d4c226c14cedb5b3d": [
+          "C_000676_44.jpg",
+          "C_000676_45.jpg"
+        ],
+        "e9ad03d7e8085b7847fbee3956a5ee74c43de9f52eb90374723850002285f269": [
+          "C_001173_43.jpg",
+          "C_001173_44.jpg"
+        ]
+      }
+    }
+  ],
+  "duplicate_groups": {
+    "expected": {
+      "11400de54cd39aaaf96c9ec0a47566f15dc5db86166e4d620e5a53a341252662": {
+        "paths": [
+          "data/stage1/videos/original/000002.mp4",
+          "data/stage2/videos/000002.mp4"
+        ],
+        "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+      },
+      "37aa2954975cb3de5263edc5084d7fb10512db055d5eb5eaf226d0ef94c1c003": {
+        "paths": [
+          "data/stage1/videos/original/000003.mp4",
+          "data/stage2/videos/000003.mp4"
+        ],
+        "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+      },
+      "53d2a88becfc45f9dcb804f2f78436f2bb6246d80386ff18ded10af679d5d6f3": {
+        "paths": [
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/CAN/speed/t",
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/CAN/wheel_speed/t"
+        ],
+        "reason": "설계상 동일: comma2k19 센서들이 동일 클럭 타임스탬프 배열을 공유"
+      },
+      "6dd128290581bbd86f6998eb4fc4590c7e1300dab9eafc938ccd72a100b34bbb": {
+        "paths": [
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/magnetometer/t",
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/magnetometer_uncalibrated/t"
+        ],
+        "reason": "설계상 동일: comma2k19 센서들이 동일 클럭 타임스탬프 배열을 공유"
+      },
+      "877b6804d709acd31a8e7c4843590d674d3877fffab3d8c076332462787d2179": {
+        "paths": [
+          "data/stage1/videos/original/000001.mp4",
+          "data/stage2/videos/000001.mp4"
+        ],
+        "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+      },
+      "9753763c372b7bf2526a38fc60835dcab9cbe725ed984d1cb32a10c349fb0caf": {
+        "paths": [
+          "data/stage1/videos/original/000005.mp4",
+          "data/stage2/videos/000005.mp4"
+        ],
+        "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+      },
+      "9df28fe965d5936bb91a020b688e35304ee4b823e388cb814d077b1f934a8558": {
+        "paths": [
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/accelerometer/t",
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/gyro/t",
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/gyro_bias/t",
+          "data/external/comma2k19/Example_1/b0c9d2329ad1606b|2018-08-02--08-34-47/40/processed_log/IMU/gyro_uncalibrated/t"
+        ],
+        "reason": "설계상 동일: comma2k19 센서들이 동일 클럭 타임스탬프 배열을 공유"
+      },
+      "beeb68a9eeeccb610030fc06fd898551321532f1961eadc82ac5fe7ec893c93b": {
+        "paths": [
+          "data/stage1/videos/original/000004.mp4",
+          "data/stage2/videos/000004.mp4"
+        ],
+        "reason": "설계상 동일: Stage1 ORIGINAL 과 Stage2 영상은 같은 CCD 원본 클립"
+      }
+    },
+    "unexpected": {},
+    "crashbest_consecutive": {
+      "e91f044344e04ae20923f3e5ff3eff789b32c3784fbcc87d4c226c14cedb5b3d": [
+        "C_000676_44.jpg",
+        "C_000676_45.jpg"
+      ],
+      "6bd9bc24240209b215b86f85f9bbdf010349f649dab76ba7b550e2d5e123f1a7": [
+        "C_000826_43.jpg",
+        "C_000826_44.jpg"
+      ],
+      "5986ac1df6cac3d81cff80a3e9e2436cccd868ad5e0075bd9cc5f1d1f5738ab6": [
+        "C_000826_49.jpg",
+        "C_000826_50.jpg"
+      ],
+      "2fc70eedffc7cbe197d21bd32bd3c75b301462e7d8d19c64cf008114e2d27eca": [
+        "C_000989_43.jpg",
+        "C_000989_44.jpg",
+        "C_000989_45.jpg",
+        "C_000989_46.jpg"
+      ],
+      "a19684c3cead12d4001ca502d3503b0df992f38671bb01e8f2093fa88ddfb52e": [
+        "C_001173_41.jpg",
+        "C_001173_42.jpg"
+      ],
+      "e9ad03d7e8085b7847fbee3956a5ee74c43de9f52eb90374723850002285f269": [
+        "C_001173_43.jpg",
+        "C_001173_44.jpg"
+      ]
+    }
+  }
+}

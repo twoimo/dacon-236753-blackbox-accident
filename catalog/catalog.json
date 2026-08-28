@@ -1,0 +1,300 @@
+{
+  "catalog_version": "1.0.0",
+  "generated_at": "2026-08-28T08:17:59+00:00",
+  "hashes_included": true,
+  "competition": {
+    "id": "236753",
+    "name": "블랙박스 영상 기반 지능형 고의사고 분석 모델 AI 경진대회",
+    "url": "https://dacon.io/competitions/official/236753/overview/description",
+    "hosts": [
+      "행정안전부",
+      "한국지능정보사회진흥원"
+    ],
+    "organizer": "국립과학수사연구원",
+    "operator": "데이콘",
+    "submission_mode": "code (submit.zip)",
+    "stage_weights": {
+      "stage1": 0.2,
+      "stage2": 0.4,
+      "stage3": 0.4
+    },
+    "timeline": {
+      "registration_start": "2026-08-18",
+      "competition_start": "2026-08-26",
+      "team_merge_deadline": "2026-09-23",
+      "leaderboard_deadline": "2026-09-29",
+      "competition_end": "2026-09-30",
+      "round2_report_deadline": "2026-10-05",
+      "final_results": "2026-10-16"
+    },
+    "eval_server": {
+      "gpu": "NVIDIA L40S (44.7 GiB)",
+      "cpu": "7 vCPU",
+      "ram_gb": 60,
+      "internet": false,
+      "inference_time_limit_min": 60,
+      "package_install_limit_min": 10,
+      "submit_zip_limit_gb": 10,
+      "uncompressed_limit_gb": 32,
+      "pretrained_weights": "weights=None 필수 (인터넷 차단)"
+    }
+  },
+  "stages": {
+    "stage1": {
+      "task": "재녹화 여부 이진 분류",
+      "weight": 0.2,
+      "metric": "Macro-F1",
+      "eval_input_layout": "data/stage1/videos/** (재귀 탐색, ID = 파일 stem)",
+      "labels_csv": {
+        "columns": [
+          "ID",
+          "path",
+          "label"
+        ],
+        "label_values": [
+          "ORIGINAL",
+          "RERECORDED"
+        ]
+      },
+      "submission_csv": {
+        "columns": [
+          "ID",
+          "answer"
+        ],
+        "answer_values": [
+          "ORIGINAL",
+          "RERECORDED"
+        ]
+      }
+    },
+    "stage2": {
+      "task": "충돌/진입 시점 + 회피공간·진입방향 분석",
+      "weight": 0.4,
+      "metric": "시각(초) 오차 + 범주 정확도",
+      "eval_input_layout": "data/stage2/images/<ID>/frame_XXXXXX.jpg (ID = 폴더명, 프레임번호 = 파일명 숫자)",
+      "labels_csv": {
+        "columns": [
+          "ID",
+          "path",
+          "t_collision",
+          "t_entry",
+          "evasion_space",
+          "entry_side"
+        ],
+        "notes": "-1 은 공개 정답 없음(손실 계산 제외). 공개 예제는 t_collision 만 유효."
+      },
+      "submission_csv": {
+        "columns": [
+          "ID",
+          "collision_frame",
+          "entry_frame",
+          "evasion_space",
+          "entry_side"
+        ],
+        "evasion_space_values": [
+          0,
+          1
+        ],
+        "entry_side_values": [
+          "LEFT",
+          "RIGHT"
+        ]
+      }
+    },
+    "stage3": {
+      "task": "0.1초 단위 가감속·조향 범주 분류",
+      "weight": 0.4,
+      "metric": "범주 정확도 (STOPPED 프레임은 조향 평가 제외)",
+      "eval_input_layout": "data/stage3/videos/*.mp4 (10Hz, ID = 파일 stem, 1프레임 = 1 sample = 0.1s)",
+      "labels_csv": {
+        "columns": [
+          "ID",
+          "sample_index",
+          "frame_index",
+          "time_seconds",
+          "accel_label",
+          "steer_label"
+        ],
+        "accel_values": [
+          "ACCELERATING",
+          "DECELERATING",
+          "CONSTANT",
+          "STOPPED"
+        ],
+        "steer_values": [
+          "LEFT",
+          "STRAIGHT",
+          "RIGHT"
+        ]
+      },
+      "submission_csv": {
+        "columns": [
+          "ID",
+          "sample_index",
+          "accel_label",
+          "steer_label"
+        ]
+      }
+    }
+  },
+  "index_files": {
+    "catalog/files.csv": "CrashBest 이미지를 제외한 전체 파일 인덱스 (path, dataset, category, bytes, sha256)",
+    "catalog/media_index.csv": "영상·이미지의 코덱/해상도/프레임수",
+    "catalog/crashbest_index.csv": "CrashBest 75,000장 × 프레임 라벨 + 영상 메타 조인",
+    "catalog/crashbest_videos.csv": "CrashBest 영상 단위 집계 (1,500행)",
+    "catalog/integrity.json": "무결성 판정 결과"
+  },
+  "datasets": {
+    "competition_samples": {
+      "description": "대회 공개 예제. 평가서버와 동일한 Stage별 경로 구조로 배치되어 있다.",
+      "root": "data/stage1, data/stage2, data/stage3",
+      "provenance": "baseline.zip (대회 배포)",
+      "license": "대회 참가 목적 사용"
+    },
+    "CCD": {
+      "description": "Car Crash Dataset. 1,500개 크래시 영상의 50프레임 시퀀스 + 프레임별 크래시 주석.",
+      "root": "data/external/CrashBest, data/external/Crash_Table.csv",
+      "upstream": "https://github.com/Cogito2012/CarCrashDataset",
+      "mirror": "https://www.kaggle.com/datasets/asefjamilajwad/car-crash-dataset-ccd",
+      "paper": "Bao et al., Uncertainty-based Traffic Accident Anticipation, ACM MM 2020",
+      "stats": {
+        "present": true,
+        "image_count": 75000,
+        "video_count": 1500,
+        "total_bytes": 8594453716,
+        "resolutions": {
+          "1280x720": 73250,
+          "960x720": 800,
+          "640x360": 950
+        },
+        "frames_per_video": {
+          "50": 1500
+        },
+        "annotation_join_coverage": 1.0,
+        "condition_distribution": {
+          "timing": {
+            "Day": 1325,
+            "Night": 175
+          },
+          "weather": {
+            "Normal": 1141,
+            "Snowy": 235,
+            "Rainy": 124
+          },
+          "egoinvolve": {
+            "Yes": 801,
+            "No": 699
+          }
+        },
+        "duplicate_image_count": 8
+      },
+      "used_for": [
+        "stage1",
+        "stage2"
+      ]
+    },
+    "comma2k19": {
+      "description": "CA-280 고속도로 주행 데이터. Example 세그먼트에 CAN/IMU/GNSS/global_pose 포함.",
+      "root": "data/external/comma2k19",
+      "upstream": "https://github.com/commaai/comma2k19",
+      "full_dataset": "Academic Torrents, ~100GB, 2019 segments, 33h+",
+      "used_for": [
+        "stage3"
+      ]
+    }
+  },
+  "dataset_summary": {
+    "CCD": {
+      "file_count": 75001,
+      "bytes": 8594656005,
+      "categories": {
+        "table": 1,
+        "image": 75000
+      }
+    },
+    "baseline": {
+      "file_count": 3,
+      "bytes": 44598,
+      "categories": {
+        "notebook": 2,
+        "document": 1
+      }
+    },
+    "comma2k19": {
+      "file_count": 61,
+      "bytes": 67394633,
+      "categories": {
+        "other": 44,
+        "document": 3,
+        "image": 3,
+        "video": 1,
+        "notebook": 3,
+        "code": 7
+      }
+    },
+    "competition_SOURCES.md": {
+      "file_count": 1,
+      "bytes": 648,
+      "categories": {
+        "document": 1
+      }
+    },
+    "competition_stage1": {
+      "file_count": 11,
+      "bytes": 5981308,
+      "categories": {
+        "labels": 1,
+        "video": 10
+      }
+    },
+    "competition_stage2": {
+      "file_count": 256,
+      "bytes": 13747804,
+      "categories": {
+        "labels": 1,
+        "image": 250,
+        "video": 5
+      }
+    },
+    "competition_stage3": {
+      "file_count": 6,
+      "bytes": 187508113,
+      "categories": {
+        "labels": 1,
+        "video": 5
+      }
+    },
+    "docs": {
+      "file_count": 8,
+      "bytes": 51534,
+      "categories": {
+        "document": 8
+      }
+    },
+    "root": {
+      "file_count": 11,
+      "bytes": 8999172199,
+      "categories": {
+        "other": 8,
+        "document": 3
+      }
+    },
+    "scripts": {
+      "file_count": 9,
+      "bytes": 65239,
+      "categories": {
+        "code": 9
+      }
+    }
+  },
+  "totals": {
+    "indexed_file_count": 75367,
+    "indexed_bytes": 17868622081
+  },
+  "integrity_summary": {
+    "error": 1,
+    "warning": 2,
+    "info": 1,
+    "ok": 8
+  }
+}

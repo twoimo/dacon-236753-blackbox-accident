@@ -1,0 +1,11 @@
+ID,path,label
+S1_O_001,videos/original/000001.mp4,ORIGINAL
+S1_O_002,videos/original/000002.mp4,ORIGINAL
+S1_O_003,videos/original/000003.mp4,ORIGINAL
+S1_O_004,videos/original/000004.mp4,ORIGINAL
+S1_O_005,videos/original/000005.mp4,ORIGINAL
+S1_R_001,videos/rerecorded/000001.mp4,RERECORDED
+S1_R_002,videos/rerecorded/000002.mp4,RERECORDED
+S1_R_003,videos/rerecorded/000003.mp4,RERECORDED
+S1_R_004,videos/rerecorded/000004.mp4,RERECORDED
+S1_R_005,videos/rerecorded/000005.mp4,RERECORDED
