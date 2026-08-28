@@ -1,6 +1,6 @@
 {
   "catalog_version": "1.0.0",
-  "generated_at": "2026-08-28T08:17:59+00:00",
+  "generated_at": "2026-08-28T08:26:07+00:00",
   "hashes_included": true,
   "competition": {
     "id": "236753",
@@ -232,7 +232,7 @@
         "code": 7
       }
     },
-    "competition_SOURCES.md": {
+    "competition_meta": {
       "file_count": 1,
       "bytes": 648,
       "categories": {
@@ -272,24 +272,24 @@
       }
     },
     "root": {
-      "file_count": 11,
-      "bytes": 8999172199,
+      "file_count": 6,
+      "bytes": 20420,
       "categories": {
-        "other": 8,
+        "other": 3,
         "document": 3
       }
     },
     "scripts": {
       "file_count": 9,
-      "bytes": 65239,
+      "bytes": 66190,
       "categories": {
         "code": 9
       }
     }
   },
   "totals": {
-    "indexed_file_count": 75367,
-    "indexed_bytes": 17868622081
+    "indexed_file_count": 75362,
+    "indexed_bytes": 8869471253
   },
   "integrity_summary": {
     "error": 1,

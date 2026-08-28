@@ -35,8 +35,15 @@ from PIL import Image
 CATALOG_VERSION = "1.0.0"
 IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 VIDEO_EXT = {".mp4", ".avi", ".mov", ".mkv", ".m4v", ".hevc", ".3gp", ".3gpp", ".wmv"}
-# 카탈로그에서 제외할 경로 (생성물·환경·VCS 내부)
-EXCLUDE_DIRS = {".git", ".venv", "__pycache__", ".DS_Store", "node_modules", ".ipynb_checkpoints"}
+# 카탈로그에서 제외할 경로.
+# VCS·환경·캐시와 함께 배포/학습 산출물(dist, model, output …)도 제외한다.
+# 이들은 데이터셋이 아니라 데이터셋에서 파생된 것이므로 색인 대상이 아니다.
+EXCLUDE_DIRS = {
+    ".git", ".venv", "venv", "env", "__pycache__", ".DS_Store", "node_modules",
+    ".ipynb_checkpoints", ".pytest_cache", ".ruff_cache", ".mypy_cache",
+    "dist", "model", "output", "runs", "wandb", "checkpoints",
+    ".gjc", ".kiro", ".claude",
+}
 CRASHBEST_REL = "data/external/CrashBest"
 
 
@@ -65,8 +72,11 @@ def classify(rel: str, suffix: str) -> tuple[str, str]:
         if parts[1] == "external":
             dataset = parts[2] if len(parts) > 2 else "external"
             dataset = "CCD" if dataset in {"CrashBest", "Crash_Table.csv"} else dataset
-        else:
+        elif parts[1].startswith("stage"):
             dataset = f"competition_{parts[1]}"
+        else:
+            # data/ 바로 아래의 파일(예: data/SOURCES.md)
+            dataset = "competition_meta"
     elif parts[0] == "baseline":
         dataset = "baseline"
     elif parts[0] in {"docs", "catalog", "scripts"}:

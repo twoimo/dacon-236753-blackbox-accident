@@ -1,6 +1,6 @@
 path,dataset,category,extension,bytes,mime,sha256
 .gitattributes,root,other,,1089,,628ca2fda0dfcb0c5b20020bffb2c8b3c95c4e557036b7b27797cd3cb28e292d
-.gitignore,root,other,,1859,,5842f0f9e9bb9f456ca073357190c2967c4366259852b344ca87cf57dee9ec32
+.gitignore,root,other,,2069,,0d49f144b2507a47c7faf87a4536fc258509e4d4d02eb6ebeaa9104b12c79401
 AGENTS.md,root,document,.md,5534,,c07306a58c2b2421d8d332cb421963518829a580edc08b2e624dd81dc8e45834
 Makefile,root,other,,2912,,260c7934468c07a2be9b3f102fb5f756c34221d8597662fecb8e27cff150c4ee
 README.md,root,document,.md,8633,,cf431530262565593c57f7707827a2a50790e7efd1f83af24bea72aac0aaced1
@@ -8,7 +8,7 @@ requirements-tools.txt,root,document,.txt,183,text/plain,acf3270c9366b8234a60c77
 baseline/baseline_inference.ipynb,baseline,notebook,.ipynb,34434,,90290ac5978937ca23ea269952b0b13f162b99c79c9509e8a087fbdbd3052aa1
 baseline/baseline_train.ipynb,baseline,notebook,.ipynb,10059,,87e72ce5525da317d5b699dba5de2bbc18d0d90f21e013d6b402ba70e5d821f9
 baseline/requirements.txt,baseline,document,.txt,105,text/plain,e3c914f4173e20cdfcb1782b04885af98bf84833f84155648e852b4338af9b3c
-data/SOURCES.md,competition_SOURCES.md,document,.md,648,,3242417074f50b21994831f5a5d6a522b45a36de5bab693b7a25e32023e3772d
+data/SOURCES.md,competition_meta,document,.md,648,,3242417074f50b21994831f5a5d6a522b45a36de5bab693b7a25e32023e3772d
 data/external/Crash_Table.csv,CCD,table,.csv,202289,text/csv,4036cda8ce250f91b2ae511bdd9fd3d752ad246f16c535f5dde23777510241a8
 data/external/comma2k19/.gitignore,comma2k19,other,,1203,,a2ebfecdb6c1b58267fbe97e6e2ac02c2b963df7673fc1047270f0f0cff16732
 data/external/comma2k19/.gitmodules,comma2k19,other,,90,,80d9c901d629ac419bd8ce0cb33ac64fabd62a211f213650903027dc755f4413
@@ -344,11 +344,6 @@ data/stage3/videos/OPEN_002.mp4,competition_stage3,video,.mp4,37533263,video/mp4
 data/stage3/videos/OPEN_003.mp4,competition_stage3,video,.mp4,37468456,video/mp4,49ba4d36215db29a10b3ee61b4eaa01767fe6c07a244b45cb4b05578d3a234f2
 data/stage3/videos/OPEN_004.mp4,competition_stage3,video,.mp4,37403267,video/mp4,d2ff2e8dbb17b157c67210855f55a35fd60fa8501f2b40d9a2ba65e1a0e12b92
 data/stage3/videos/OPEN_005.mp4,competition_stage3,video,.mp4,37521019,video/mp4,fccb0a18a680bc24cf7d357a5cf273995459e945ffdb7231c255fcf43933aaf1
-dist/SHA256SUMS,root,other,,388,,6d21742fa4c76f1dfc67e186ba83fe0bb004a6eac3756427d2d390e85031435a
-dist/dacon236753-catalog.tar.zst,root,other,.zst,3246088,,2b64200a8dad88b30c03c93c597acc0c8498696ea774a2108a1da3107d928869
-dist/dacon236753-ccd-crashbest.tar,root,other,.tar,8729024000,application/x-tar,57fb236f0dd657e9893da16083dae4c885827e9148770e8303dc60e34f23bb14
-dist/dacon236753-comma2k19.tar.zst,root,other,.zst,59128809,,99ccd43ff22ecb590536f4e8495b417cb490aa7473dab5a447759c5884563379
-dist/dacon236753-competition-samples.tar,root,other,.tar,207752704,application/x-tar,4c92129333c8d9910f4b0b74182b412daa93ea328086bdc899f9e6b0b22f4624
 docs/01-competition-overview.md,docs,document,.md,4141,,376d4706d57cec5b23464022085af46c7cf167f40104a96f38802be1063f7489
 docs/02-data-spec.md,docs,document,.md,4647,,77d921fa73b7b75af578c036ced00093460d42b6287471ec4d14ee5a11b1f4f2
 docs/03-evaluation-and-submission.md,docs,document,.md,6714,,62f1f74be9a8425a8e626e5ee2ee20ac1b1663d188fc6b2b05f74b5d7f4f6097
@@ -357,10 +352,10 @@ docs/05-data-integrity-report.md,docs,document,.md,13694,,64112b658a67eb92a1ad03
 docs/06-collaboration.md,docs,document,.md,7650,,04da2947375136e5b7a5137be25458139e6725d224308527572af3924dc17aa8
 docs/07-dataset-distribution.md,docs,document,.md,2312,,b018345be78b7ba0f8b9afed5238e32cd0c53df44a1a47b17c9b697aad4c04a3
 docs/README.md,docs,document,.md,2089,,34a5bf162fbf441be7f7606ce4b99138f2d5b23c940644f247c308e4470e5653
-scripts/build_catalog.py,scripts,code,.py,30516,text/x-python,ba82980cadccf088250a589eabb96a7eef583f0d8e1dd7a599be9c413dd42a80
-scripts/fetch_data.sh,scripts,code,.sh,4095,application/x-sh,272a35fe712b694f1c091b6339caf3e652cb56cb5d41cd2e935243deda48bf16
+scripts/build_catalog.py,scripts,code,.py,31009,text/x-python,125fb4535f88ede7bce81581927839a644604288748a9ec2e3df892153c4aecd
+scripts/fetch_data.sh,scripts,code,.sh,4467,application/x-sh,bcbfdfab8f8124386e2498fc1a9d3e27e34e6e8b4bf84e6991f5ee5755ce364f
 scripts/gdrive_setup.sh,scripts,code,.sh,3012,application/x-sh,ef52bb76aae47619dc7884342c4deba90e9d3f3e74255add6faff1395b7a1f6a
-scripts/gdrive_upload.sh,scripts,code,.sh,6094,application/x-sh,90d686dde92a6bd619fe1b45e49a6b66b512c155b5ffc68e0fcb3dec5512f42d
+scripts/gdrive_upload.sh,scripts,code,.sh,6180,application/x-sh,fa9b30908f072193258997b01eaf5d69ceee7e7a864670d049518fada5539e06
 scripts/make_stage2_images.py,scripts,code,.py,2284,text/x-python,3d8b9aee0fe593e123776b5d9bea11fbf227adbbd9c5f03b771a1d4bb4b1dc72
 scripts/make_stage2_labels.py,scripts,code,.py,3322,text/x-python,37eb0f3162a7d5bddde531e67548caa7bd232e9848c116ff5f722071e789d38c
 scripts/make_stage3_labels_from_comma2k19.py,scripts,code,.py,7961,text/x-python,081457f96a9030d90ada38e498d1dba3cc14f2ec52ec9e350dd812a2e59bc6ec
