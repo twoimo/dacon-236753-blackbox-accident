@@ -27,7 +27,7 @@
 - `mvit_v2_s(weights="DEFAULT")` 같은 **자동 다운로드 금지**. 반드시 `weights=None` 으로 생성 후
   `model/` 에 동봉한 `.pt` 를 **로컬 경로로 로드**.
 - HuggingFace `from_pretrained("...")` (허브 조회) 금지. 가중치를 zip에 포함.
-- 베이스라인 관행: ResNet-18 ImageNet 가중치를 **학�� 시점에** 받아
+- 베이스라인 관행: ResNet-18 ImageNet 가중치를 **학습 시점에** 받아
   `model/stage2/resnet18-f37072fd.pth` 로 저장 → 추론 때 그 파일만 읽음.
 
 ## 3. 패키지 — 서버 기본 설치본과 중복 최소화 (docs/03 §6)

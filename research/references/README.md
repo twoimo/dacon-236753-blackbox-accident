@@ -31,7 +31,7 @@ DACON 236753 (블랙박스 영상 기반 지능형 고의사고 분석) 리서�
 | `schafer2018comma2k19` | A Commute in Data: The comma2k19 Dataset — Schafer, Santana, Haden, Biasini | arXiv 2018 (comma.ai 기술보고) | 1812.05752 | 수백 회 (GS) | Stage 3 (데이터 원조) |
 | `chan2016anticipating` | Anticipating Accidents in Dashcam Videos — Chan, Chen, Xiang, Sun | **ACCV 2016** | — | **약 410 (GS)** | Stage 2 (분야 정초 논문) |
 
-- `bao2020ccd`: 우리가 쓰는 **Car Crash Dataset(CCD)** ��� 만든 논문. Cascade R-CNN으로 위험
+- `bao2020ccd`: 우리가 쓰는 **Car Crash Dataset(CCD)** 을 만든 논문. Cascade R-CNN으로 위험
   영역 후보를 뽑고 GCN+RNN+베이지안 신경망으로 사고확률 시계열과 불확실성을 함께 예측한다.
   프레임별 0/1 주석이 Stage 2 충돌시점 정의의 근거다.
 - `schafer2018comma2k19`: 33시간·2,019 세그먼트 캘리포니아 280 고속도로 주행 데이터. 카메라 +
