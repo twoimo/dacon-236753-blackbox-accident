@@ -68,3 +68,6 @@ credentials.json
 client_secret*.json
 token.json
 rclone.conf
+
+# 실험 특징 캐시 (재생성 가능)
+experiments/cache/

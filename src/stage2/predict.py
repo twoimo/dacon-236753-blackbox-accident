@@ -140,9 +140,9 @@ def predict_stage2(data_dir, model_dir):
     from src.common.submit_guard import check_stage2
 
     id_dirs = D.stage2_image_dirs(data_dir)
-    model_path = Path(model_dir) / "best.pt"
+    model_path = Path(model_dir) / "collision_head.pt"
 
-    # torch 헤드 우선 (있으면). 현재 미구현 → heuristic 폴백.
+    # 학습 헤드 우선 (collision_head.pt 있으면). 없거나 실패 시 heuristic 폴백.
     torch_head = None
     if model_path.exists():
         try:
@@ -184,13 +184,100 @@ def predict_stage2(data_dir, model_dir):
     return check_stage2(df, frame_counts=frame_counts)
 
 
-def _try_load_torch_head(model_path: Path):
-    """학습된 시간 국소화 헤드 로더 (미구현 자리표시).
+# 학습 헤드 특징 포맷 (experiments/stage2_extract_features.py 와 일치)
+_HEAD_GRID = 32            # 프레임 그레이스케일 다운스케일 (특징 = 32*32=1024)
+_HEAD_ENS_W = 0.5         # 학습 예측 vs 모션 onset 앙상블 가중 (5-fold 검증치)
 
-    반환 시 callable(stack, nums) -> (coll, entry, evas, side).
-    현재는 헤드 스키마 미확정 → NotImplementedError (호출부에서 heuristic 폴백).
+
+def _build_motion_aware_head(feat_dim: int):
+    """experiments/stage2_cv_train.py 의 MotionAwareHead 와 동일 구조 (추론용)."""
+    import torch.nn as nn
+
+    class MotionAwareHead(nn.Module):
+        def __init__(self, fd: int, emb: int = 96, gru: int = 96):
+            super().__init__()
+            self.proj = nn.Sequential(nn.Linear(fd, emb), nn.ReLU(), nn.LayerNorm(emb))
+            self.gru = nn.GRU(emb + 2, gru, batch_first=True, bidirectional=True)
+            self.head = nn.Sequential(nn.Linear(2 * gru, 64), nn.ReLU(), nn.Linear(64, 1))
+
+        def forward(self, x, motion, onset):
+            e = self.proj(x)
+            z = __import__("torch").cat([e, motion.unsqueeze(-1), onset.unsqueeze(-1)], dim=-1)
+            h, _ = self.gru(z)
+            return self.head(h).squeeze(-1)
+
+    return MotionAwareHead(feat_dim)
+
+
+def _try_load_torch_head(model_path: Path):
+    """학습된 충돌 국소화 헤드 로더 → callable(stack, nums) -> (coll, entry, evas, side).
+
+    model_dir/collision_head.pt (stage2_cv_train.py 산출) 을 로드. 학습 logit(prior 창
+    argmax)과 모션 onset 을 5:5 앙상블 (5-fold 검증: MAE 4.54f, heuristic 5.68f 대비 개선).
+    체크포인트가 없거나 로드 실패 시 예외 → 호출부에서 heuristic 폴백.
     """
-    raise NotImplementedError("Stage2 torch 헤드 미구현 — heuristic 폴백 사용")
+    import torch
+
+    ckpt_path = model_path.parent / "collision_head.pt"
+    if not ckpt_path.exists():
+        raise FileNotFoundError("collision_head.pt 없음")
+    ckpt = torch.load(ckpt_path, map_location="cpu")
+    feat_dim = int(ckpt.get("feat_dim", _HEAD_GRID * _HEAD_GRID))
+    grid = int(ckpt.get("grid", _HEAD_GRID))
+    prior = float(ckpt.get("prior", CCD_MIN_FRAC))
+    ens_w = float(ckpt.get("ensemble_weight", _HEAD_ENS_W))
+    model = _build_motion_aware_head(feat_dim)
+    model.load_state_dict(ckpt["state_dict"])
+    model.eval()
+
+    def _infer(stack, nums):
+        # stack: (N, H, W) 그레이스케일 (predict 의 DOWNSCALE). 학습 특징(grid)으로 재추출.
+        from PIL import Image
+        n = len(nums)
+        feats = np.zeros((n, feat_dim), dtype=np.float32)
+        for i in range(n):
+            im = Image.fromarray(stack[i].astype(np.uint8)).resize((grid, grid), Image.BILINEAR)
+            feats[i] = (np.asarray(im, np.float32) / 255.0).reshape(-1)
+        # 모션 신호 (predict 의 DOWNSCALE stack 기준)
+        mot = np.zeros(n, dtype=np.float32)
+        if n > 1:
+            d = np.abs(np.diff(stack, axis=0)).reshape(n - 1, -1).mean(axis=1)
+            mot[1:] = d
+        onset = np.zeros(n, dtype=np.float32)
+        if n > 1:
+            onset[1:] = np.clip(np.diff(mot), 0, None)
+        mn = (mot - mot.mean()) / (mot.std() + 1e-6)
+        on = (onset - onset.mean()) / (onset.std() + 1e-6)
+        xt = torch.tensor(feats[None], dtype=torch.float32)
+        mt = torch.tensor(mn[None], dtype=torch.float32)
+        ot = torch.tensor(on[None], dtype=torch.float32)
+        with torch.no_grad():
+            logit = model(xt, mt, ot).squeeze(0).numpy()
+        # prior 창 argmax (학습 예측)
+        lo = int(prior * n)
+        masked = logit.copy(); masked[:lo] = -1e9
+        learned_idx = int(np.argmax(masked))
+        # 모션 onset (휴리스틱)
+        seg = mot[lo:]
+        onset_idx = lo + int(np.argmax(np.diff(seg))) + 1 if len(seg) >= 2 else n // 2
+        coll_idx = int(round(ens_w * learned_idx + (1 - ens_w) * onset_idx))
+        coll_idx = max(0, min(coll_idx, n - 1))
+        collision_frame = nums[coll_idx]
+        entry_idx = max(0, coll_idx - ENTRY_OFFSET)
+        entry_frame = nums[entry_idx]
+        # 진입 방향: 충돌 직전 좌/우 모션 비대칭 (약지도)
+        side = DEFAULT_SIDE
+        try:
+            w0 = max(0, coll_idx - 8)
+            win = np.abs(stack[w0 + 1:coll_idx + 1] - stack[w0:coll_idx])
+            if win.size:
+                half = win.shape[2] // 2
+                side = "LEFT" if win[:, :, :half].mean() > win[:, :, half:].mean() else "RIGHT"
+        except Exception:
+            side = DEFAULT_SIDE
+        return collision_frame, entry_frame, DEFAULT_EVASION, side
+
+    return _infer
 
 
 if __name__ == "__main__":
