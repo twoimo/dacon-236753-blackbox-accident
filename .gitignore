@@ -25,7 +25,8 @@
 *.onnx
 *.safetensors
 submit.zip
-inference.py
+# NOTE: 루트 inference.py 는 실험 브랜치의 제출 진입점 소스라 추적한다.
+#       (평가 서버가 요구하는 predict_stage{1,2,3} 를 노출)
 
 # ─── 파이썬 ─────────────────────────────────────────────────────────────────
 .venv/
