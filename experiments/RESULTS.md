@@ -128,35 +128,28 @@ CCD 1,500영상 특징(32×32 flatten + 모션)으로 학습형 충돌 국소화
 **정직한 캐비앗**: MPS 미가용 환경(평가서버 CUDA)에서는 predict 의 numpy/heuristic 경로로도 동작하도록
 설계됨(torch 있으면 학습헤드, 없으면 휴리스틱 폴백). 학습 특징이 raw 32×32 flatten이라 CNN 공간특징
 대비 단순 → 여기서 더 낮추려면 프레임 CNN 백본(ResNet-18) 학습이 다음 단계(GPU 시간 더 필요).
+## Stage 3 학습형 분류기 — **실패 (정직 기록)** (2026-08-30, MPS GPU)
 
----
+무학습 흐름 임계값(accel 0.642 / steer 0.853)을 신경망으로 넘으려 시도했으나 **실패**했다.
+재현: `python -m experiments.stage3_extract_features` → `python -m experiments.stage3_train_head`.
 
-## Stage 2 학습형 충돌 헤드 — GPU(MPS) 학습 (2026-08-30, 로컬 맥 M5 Max)
-
-보안 정책 해제로 **MPS GPU 활성화**(CPU 대비 5.3배). torch 2.8.0/pandas/cv2 로드 가능.
-CCD 1,500영상 특징(32×32 grayscale flatten 1024 + 모션)으로 충돌 국소화 헤드를 GPU 학습.
-재현: `python -m experiments.stage2_extract_features` → `python -m experiments.stage2_cv_train`.
-
-시행착오(정직 기록):
-- v1 (temporal conv, 특징만): MAE 6.31f → **휴리스틱(5.22f)보다 나쁨** (모션 신호 미활용).
-- v2 (BiGRU + 모션/onset 명시 채널): 개선. 학습+휴리스틱 앙상블이 최고.
-
-**5-fold 교차검증 (video split, 1,500영상):**
-
-| 방법 | MAE(frame) | MAE(sec) | within-3f |
+| 방법 | accel_acc | steer_acc | 비고 |
 |---|---|---|---|
-| heuristic onset+prior | 5.68 ± 0.28 | 0.568 | — |
-| learned head (BiGRU) | 4.74 ± 0.29 | 0.474 | — |
-| **ensemble 50/50 (채택)** | **4.54 ± 0.12** | **0.454** | **0.50** |
+| **무학습 임계값 (기존 채택)** | **0.642** | **0.853** | src/stage3/flow.py |
+| majority baseline | 0.510 | 0.843 | 최빈 클래스 |
+| 학습 MLP (window ±5, 792차원) | 0.475 | 0.705 | 블록 CV 5분할 |
+| 학습 MLP (window 1, 72차원) | 0.432 | 0.715 | 더 작은 모델도 동일 실패 |
 
-- 앙상블이 휴리스틱 대비 **1.14프레임(0.11초) 개선**, 분산 작아(±0.12) 안정적.
-- 최종 모델: `model/stage2/collision_head.pt` (전체 데이터 학습). predict_stage2 가 로드해
-  학습 logit(prior 창 argmax) + 모션 onset 을 50/50 앙상블. 없으면 heuristic 폴백.
-- predict 파이프라인 실행 검증 완료(5 샘플 + CCD 20영상 MAE 2.3f/학습셋 참고치).
+**원인 분석 (근거 있음)**:
+1. **단일 세그먼트 한계**: comma2k19 라벨이 1개 세그먼트 600샘플(60초)뿐. 특징 차원(72~792)이
+   표본 대비 과다 → 과적합. 모델을 줄여도(72차원) 개선되지 않음 → 데이터 부족이 근본 원인.
+2. **블록 간 분포 편차 극심**: 블록별 steer 정확도 0.42~0.92 (±0.16). 60초 주행 안에서도 구간별
+   거동이 달라, 시계열 분할 시 train 구간이 test 구간을 대표하지 못함.
+3. research/03 및 라벨 분석 리포트가 경고한 "단일 세그먼트·STOPPED 0개" 리스크가 실증됨.
 
-**GPU 진단**: 이전 세션의 MPS 차단은 샌드박스 sysctl 차단이 원인이었고, 보안 해제 후
-`mps.is_available()=True`. M5 Max 40코어 GPU로 학습(60ep×5fold ≈ 100초). 평가서버는 CUDA L40S
-이므로 가중치 저장 후 서버 추론 재현 필요(weights 로컬 로드 규약).
+**조치**: 무학습 임계값 방식을 **그대로 유지**(predict 변경 없음). 모델 저장하지 않음.
+Stage 3 개선의 전제조건은 **전체 comma2k19(~2,019 세그먼트) 라벨 확장**이며, 그 전에는
+어떤 학습 모델도 신뢰할 수 없다. 이것이 이번 실험의 핵심 결론이다.
 
-**정직한 캐비앗**: 32×32 flatten 은 공간구조 손실 — CNN(ResNet-18) 특징이면 더 오를 여지.
-CCD 라벨은 first_crash_frame_index 로 정의됐고 대회 비공개 정답 규칙과 다를 수 있음(추정).
+**교훈**: GPU가 있어도 데이터가 없으면 학습이 무학습 규칙을 못 넘는다. Stage 2(라벨 1,500개)에서는
+학습이 성공(4.54f)했고 Stage 3(라벨 1세그먼트)에서는 실패한 대비가 이를 명확히 보여준다.
