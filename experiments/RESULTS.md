@@ -49,3 +49,27 @@ cv2/torch/pandas는 코드사인 정책으로 미로드 → GPU/Docker에서 최
 2. Stage 2: CCD first_crash_frame 지도로 ResNet-18→BiGRU 충돌 헤드 GPU 학습.
 3. Stage 1: CrashBest에서 재촬영 합성 대량 생성 → LODO 검증으로 2-스트림 학습.
 4. GPU 기기에서 pandas/cv2/torch 경로 최종 확인 → submit.zip 패키징.
+
+---
+
+## Stage 2 대규모 실측 — CCD 1,500영상 전체 (2026-08-29, 로컬 맥)
+
+로컬 맥(numpy+PIL, torch/cv2 불가)에서 가능한 최대 규모 검증. 기존 5샘플 → **1,500영상 전체**
+(catalog first_crash_frame_index 정답). 재현: `python -m experiments.stage2_ccd_large_eval`.
+
+| 방법 | MAE(frames) | MAE(sec@10fps) | median | within-3f |
+|---|---|---|---|---|
+| midpoint (baseline) | 12.19 | 1.219 | 11.0 | — |
+| argmax (전역 피크) | 11.11 | 1.111 | 7.0 | — |
+| windowed (prior 0.55) | 5.58 | 0.558 | 4.0 | 0.45 |
+| **onset + prior 0.60 (채택)** | **5.22** | **0.522** | 4.0 | **0.48** |
+
+튜닝(experiments/stage2_estimator_search.py, prior 스윕):
+- prior_frac 스윕 0.45~0.70 → **0.60 최적** (5.41f vs 0.55의 5.53f).
+- 추정 방식: **onset(모션 1차차분 최대=충돌 상승엣지)** 이 window(피크 argmax)보다 우수, ego:No(제3자 사고)에서 특히.
+
+환경별(onset, window 유사): Snowy 4.37f < Day 5.62f < Rainy 6.10f. ego:Yes(자차관여) 4.37f < ego:No 6.97f.
+
+**결론**: 무학습 모션 휴리스틱의 통계적 상한은 MAE ~5.2f(0.52s), within-3f 48%. midpoint 대비 절반 이하로 개선.
+5샘플(2.2f)은 낙관적 소표본이었음(정직). 추가 개선은 research/synthesis대로 **CCD 지도 학습(ResNet-18→BiGRU, GPU 필요)** 이 필요.
+채택 config를 src/stage2/predict.py에 반영(CCD_MIN_FRAC=0.60, USE_ONSET=True).

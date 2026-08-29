@@ -32,9 +32,13 @@ from pathlib import Path
 import numpy as np
 
 # CCD/CrashBest 시간 prior (catalog/crashbest_videos.csv 1,500개 실측): 충돌은 클립 후반.
-CCD_MIN_FRAC = 0.55        # first_crash/frame_count min=0.60 → 여유 둔 보수 하한
+# 1,500영상 전수 그리드서치(experiments/stage2_ccd_large_eval.py) 결과:
+#   prior 0.60 + onset(모션 상승엣) 방식이 MAE 5.22f(0.52s)로 최적
+#   (window argmax 5.58f, midpoint baseline 12.19f 대비 개선), within-3f 0.48.
+CCD_MIN_FRAC = 0.60        # first_crash/frame_count min=0.60 — 실측 최적
 DOWNSCALE = 96             # 그레이스케일 다운스케일 정사각 크기
 SMOOTH_K = 3               # 모션 신호 이동평균 창
+USE_ONSET = True           # True=모션 상승엣(충돌 시작) / False=피크 argmax
 ENTRY_OFFSET = 10          # entry_frame = collision - 오프셋 (약지도, 라벨 없음)
 DEFAULT_EVASION = 0        # 안전 기본값 (0=없음)
 DEFAULT_SIDE = "RIGHT"     # 안전 기본값 (허용 범주)
@@ -70,11 +74,21 @@ def _motion_signal(stack: np.ndarray) -> np.ndarray:
 
 
 def _windowed_peak_index(d: np.ndarray, n_frames: int, min_frac: float, smooth_k: int) -> int:
-    """CCD prior 창([min_frac*N, end])에서 평활 argmax 전이 index 반환."""
+    """CCD prior 창([min_frac*N, end])에서 충돌 전이 index 반환.
+
+    USE_ONSET=True: 평활 신호의 1차차분(상승 기울기) 최대 지점 = 충돌 시작.
+      1,500영상 실측에서 argmax(피크)보다 MAE 낮음(5.22 vs 5.58f).
+    USE_ONSET=False: 종래 피크 argmax.
+    """
     ds = _moving_average(d, smooth_k)
     start_frame = int(min_frac * n_frames)
     valid_lo = max(0, min(start_frame - 1, len(ds) - 1))
     seg = ds[valid_lo:]
+    if seg.size == 0:
+        return valid_lo
+    if USE_ONSET and seg.size >= 2:
+        # 모션이 급증하는 지점(상승 기울기 최대) = 충돌 순간
+        return valid_lo + int(np.argmax(np.diff(seg))) + 1
     return valid_lo + int(np.argmax(seg))
 
 
