@@ -3,7 +3,7 @@
 근거: research/01-stage1-recapture/README.md, env/configs/stage1.yaml
 계약: METRIC lodo_macro_f1=<v>, METRIC macro_f1=<v> 출력.
 
-이 파일은 실행 ��능한 골격이다. 실제 합성/학습 로직은 실험에서 채운다:
+이 파일은 실행 가능한 골격이다. 실제 합성/학습 로직은 실험에서 채운다:
   1) CCD 프레임(data/external/CrashBest)에서 재촬영 합성 (물리>광학시뮬)
   2) 원본+재촬영을 동일 랜덤 ffmpeg 분포로 재인코딩 (코덱 누설 차단)
   3) 소스 영상 ID split + leave-one-device-out 홀드아웃
