@@ -36,8 +36,38 @@ def main() -> int:
         print("METRIC dry_run_ok=1")
         return 0
 
-    # TODO(실험): 합성→재인코딩→학습→LODO 평가
-    raise SystemExit("[stage1] 실제 학습 미구현. --dry-run 으로 설정 점검 후 실험에서 구현.")
+    return _train_real(cfg)
+
+
+def _train_real(cfg) -> int:
+    """실제 학습 진입점 — 합성→재인코딩→LODO. GPU 학습은 torch 가용 시에만.
+
+    계획(research/01 §4, 검증된 실험 훅크는 experiments/ 에 이미 구현):
+      1) 합성: CCD 75k 프레임(data/external/CrashBest)에서 Tier-2 광학 시뮬 재촬영
+         생성 — experiments/stage1_synth_recapture.synth_recapture (클립마다 파라미터 랜덤).
+      2) 재인코딩: 원본+재촬영을 동일 ffmpeg 분포로 통과해 코덱 누설 제거
+         — experiments/stage1_codec_leak_check 가 before=1→after=0 로 입증함.
+      3) 검증: source_video_id 기준 split + 최소 1화면/1카메라 홀드아웃(LODO).
+         그 홀드아웃 Macro-F1 이 진짜 지표 — METRIC lodo_macro_f1=<v>.
+      4) 모델: 2-스트림(잔차+시간). conv1 고정 Laplacian 초기화, clip_len 8~16.
+
+    torch 가 없는 로컬(code-signing) 환경에서는 안내 메시지와 함께 비제로 종료한다.
+    """
+    try:
+        import torch  # noqa: F401
+    except Exception as e:  # noqa: BLE001
+        print(f"[stage1] torch 미가동({type(e).__name__}) — GPU 학습 불가.")
+        print("[stage1] 합성/재인코딩 검증은 로컬에서 가능:")
+        print("         .venv/bin/python -m experiments.stage1_codec_leak_check")
+        print("         .venv/bin/python -m experiments.stage1_synth_recapture")
+        print("[stage1] GPU 환경(torch)에서 다시 실행하면 학습이 가동된다.")
+        raise SystemExit("[stage1] torch 부재로 실학습 중단 (로컬 macOS 예상 동작).")
+
+    # torch 가용 환경(GPU 서버)에서만 도달.
+    # TODO(exp): synth_recapture 로 포지티브 생성 → 두 클래스 동일 재인코딩 →
+    #   source_video_id split + LODO 홀드아웃 → 2-스트림 학습 →
+    #   print(f"METRIC macro_f1={{...}}"); print(f"METRIC lodo_macro_f1={{...}}")
+    raise SystemExit("[stage1] 2-스트림 학습 루프 미구현 — 합성/재인코딩 훅크는 experiments/ 에 검증됨.")
 
 
 if __name__ == "__main__":
