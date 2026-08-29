@@ -118,3 +118,18 @@ train --dry-run x3   → METRIC dry_run_ok=1 (stage1/2/3, 실제 config 값 반�
 resample_indices     → 20Hz 1200f → 10Hz 600샘플 (step=2) ✅
 validate_submission  → METRIC submission_valid=1
 ```
+
+---
+
+## 실측 결과 (2026-08-29, exp/stage3-egomotion)
+
+상세 로그: [`experiments/RESULTS.md`](experiments/RESULTS.md). 요약(majority baseline 대비):
+
+| Stage | 지표 | 결과 | baseline | 개선 |
+|---|---|---|---|---|
+| 3 가감속 | accel_acc | 0.6417 | 0.5100 | +13.2pt |
+| 3 조향 | steer_acc_moving | 0.8533 | 0.8433 | +1.0pt (약함) |
+| 2 충돌 | collision_mae_sec | 0.2200 | 0.7800 | -5.6frame |
+| 1 누설 | codec_leak | before 1 → after 0 | — | 중화 성공 |
+
+재현: `python -m experiments.stage3_flow_eval` / `stage2_collision_eval` / `stage1_codec_leak_check`
