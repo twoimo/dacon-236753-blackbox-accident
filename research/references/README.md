@@ -27,7 +27,7 @@ DACON 236753 (블랙박스 영상 기반 지능형 고의사고 분석) 리서�
 
 | Key | 논문 | 학회/저널 | arXiv | 인용수 (출처) | 관련 |
 |---|---|---|---|---|---|
-| `bao2020ccd` | Uncertainty-based Traffic Accident Anticipation with Spatio-Temporal Relational Learning — Bao, Yu, Kong | **ACM MM 2020** | 2008.00334 | 수백 회 (GS) | Stage 2 (CCD 데이터 원조) |
+| `bao2020ccd` | Uncertainty-based Traffic Accident Anticipation with Spatio-Temporal Relational Learning — Bao, Yu, Kong | **ACM MM 2020** | 2008.00334 | 약 315 (ACM DL) / 235 (S2) | Stage 2 (CCD 데이터 원조) |
 | `schafer2018comma2k19` | A Commute in Data: The comma2k19 Dataset — Schafer, Santana, Haden, Biasini | arXiv 2018 (comma.ai 기술보고) | 1812.05752 | 수백 회 (GS) | Stage 3 (데이터 원조) |
 | `chan2016anticipating` | Anticipating Accidents in Dashcam Videos — Chan, Chen, Xiang, Sun | **ACCV 2016** | — | **약 410 (GS)** | Stage 2 (분야 정초 논문) |
 
@@ -97,7 +97,7 @@ DACON 236753 (블랙박스 영상 기반 지능형 고의사고 분석) 리서�
 | Key | 논문 | 학회/저널 | arXiv | 인용수 (출처) | 역할 |
 |---|---|---|---|---|---|
 | `liao2024accnet` | Real-time Accident Anticipation via Monocular Depth-Enhanced 3D Modeling (AccNet) | **Accident Analysis & Prevention 2024** | — | ~45 (GS) | depth 보강 3D 모델링 |
-| `zeng2017agentcentric` | Agent-Centric Risk Assessment: Accident Anticipation and Risky Region Localization | **CVPR 2017** | — | 수백 회 (GS) | 공간+시간 위험 국소화 |
+| `zeng2017agentcentric` | Agent-Centric Risk Assessment: Accident Anticipation and Risky Region Localization | **CVPR 2017** | 1705.06560 | 약 120 (CVF/GS) | 공간+시간 위험 국소화 |
 
 - 대회 Stage 2는 사고 "예측"이 아니라 이미 일어난 사고의 **충돌/진입 프레임 국소화**에 가깝다.
   따라서 사고 예측(anticipation) 문헌은 특징 설계·주석 정의 참고용이고, 실제 과업은 프레임 단위
