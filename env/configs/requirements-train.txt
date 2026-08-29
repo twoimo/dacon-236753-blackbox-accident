@@ -1,0 +1,31 @@
+# 개발 기기(GPU)용 학습/추론 의존성 — 평가 서버 기설치 버전과 핀을 맞춘다.
+# 근거: docs/03-evaluation-and-submission.md §6 (평가 서버 기본 설치 패키지)
+#
+# 주의: 제출용 submit.zip/requirements.txt 에는 서버에 이미 있는 패키지를 넣지 않는다
+#       (설치 10분 제약). 이 파일은 "개발 기기 환경 정합"용이다.
+#
+# CUDA 12.8 휠은 --index-url 로 설치:
+#   pip install -r env/configs/requirements-train.txt \
+#     --extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.8.0
+torchvision==0.23.0
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.15.3
+scikit-learn==1.5.2
+opencv-python-headless==4.10.0.84
+pillow==10.4.0
+av>=15,<17
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
+albumentations==1.4.20
+scikit-image==0.24.0
+timm==1.0.15
+einops==0.8.1
+ultralytics==8.3.170
+matplotlib==3.9.2
+tqdm==4.66.5
+pyyaml==6.0.2
+omegaconf==2.3.0
+torchmetrics>=1.4,<2

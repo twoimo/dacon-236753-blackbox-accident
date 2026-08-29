@@ -1,0 +1,41 @@
+# Stage 2 — 사고 시점·상황 실험 설정
+# 근거: research/02-stage2-anticipation/README.md
+# 상속: common.yaml
+
+stage: 2
+task: temporal_localization + weak_supervised_attributes
+primary_metric: collision_mae_sec     # 충돌시각 초 단위 MAE (낮을수록 좋음)
+secondary_metrics: [entry_mae_sec, entry_side_acc, evasion_acc]
+
+# 입력: Stage 2만 이미지 폴더 (frame_XXXXXX.jpg) — 프레임 재번호 금지
+input:
+  type: image_folder
+  frame_index_from: filename           # 파일명 숫자 = 원본 프레임 번호
+
+# 충돌 국소화 (라벨 확보됨: CCD 0/1 주석)
+collision_head:
+  backbone: resnet18                   # 프레임 특징 (baseline 호환)
+  temporal: bigru                      # 또는 temporal_conv / x3d 클립
+  target: soft_gaussian                # 충돌시각 주변 부드러운 라벨 (초 오차 채점 정합)
+  peak_selection: argmax               # 또는 change_point
+
+# 진입/방향/회피 (CCD 정답 없음 → 약지도)
+entry_labeling:
+  method: track_and_lane_geometry      # 객체추적 + 자차 차선 기하 (zeng2017agentcentric)
+  detector: ultralytics                # 서버 기설치 (8.3.170)
+  entry_side_from: bbox_trajectory_origin
+evasion:
+  method: freespace_or_density_heuristic
+
+# 데이터 확장
+data:
+  negatives: ccd_normal_3000           # BDD100K 표본 — 오탐 억제 (make data로 복원)
+
+# 후처리 (제출 오답 방어 — docs/03 채점 함정)
+postprocess:
+  clip_frame_range: true               # [0, N-1]
+  integerize: true
+  category_whitelist:
+    entry_side: [LEFT, RIGHT]
+    evasion_space: [0, 1]
+  reject_on_missing: true

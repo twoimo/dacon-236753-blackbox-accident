@@ -50,6 +50,14 @@ make                # 전체 명령 목록
 │   ├── integrity.json             무결성 판정
 │   └── distribution.json          배포 링크 (publish 후 생성)
 ├── scripts/                   카탈로그 생성·검증·라벨 파생·배포
+├── research/                  ★ autoresearch 브랜치 — 근거 기반 문헌 리뷰·전략
+│   ├── references/                논문 신빙성 정본 (학회/저널 등급 + 인용수)
+│   ├── synthesis/                 종합 전략 + autoresearch verdict
+│   └── 0X-*/                      Stage별 상세 (재녹화·사고시점·거동·백본)
+├── env/                       ★ 다기기 재현 실험 환경 (팀 온보딩)
+│   ├── configs/                   Stage별 실험 설정 (하이퍼파라미터·지표 계약)
+│   ├── docker/                    평가 서버 근사 CUDA 이미지
+│   └── scripts/                   환경 세팅·자기진단·하니스 템플릿
 ├── baseline/                  대회 배포 베이스라인 (원본 보존, 미수정)
 └── data/                      평가 서버와 동일한 레이아웃
     ├── stage1/  labels.csv + videos/{original,rerecorded}/

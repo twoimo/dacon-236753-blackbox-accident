@@ -1,0 +1,23 @@
+# GPU 개발 컨테이너 (평가 서버 근사).
+# 사용:
+#   cd env/docker && docker compose build
+#   docker compose run --rm gpu bash
+#   docker compose run --rm --network none gpu bash   # 오프라인 모사
+services:
+  gpu:
+    build:
+      context: ../..
+      dockerfile: env/docker/Dockerfile
+    image: dacon236753:dev
+    shm_size: "30gb"          # 평가 서버 공유메모리 정합 (docs/03)
+    volumes:
+      - ../..:/workspace       # 프로젝트 루트 마운트
+    working_dir: /workspace
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: bash

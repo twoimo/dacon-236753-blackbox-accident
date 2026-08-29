@@ -1,0 +1,42 @@
+# Stage 3 — 가감속·조향 실험 설정
+# 근거: research/03-stage3-egomotion/README.md
+# 상속: common.yaml
+
+stage: 3
+task: egomotion_categorical
+primary_metric: mean_acc              # (accel_acc + steer_acc_moving)/2, 높을수록 좋음
+secondary_metrics: [accel_acc, steer_acc_moving, infer_minutes]
+
+# 프레임률 정합 (docs/05 최대 함정) — 여기서 틀리면 시간축 2배 어긋남
+framerate:
+  true_hz: 20                         # 컨테이너는 40fps 오선언 → 신뢰 금지
+  target_hz: 10                       # 대회 스펙 (0.1초 단위)
+  frame_count_method: ffprobe_count_frames   # duration 신뢰 불가 → 실측
+  resample: linear_interp
+
+# 조향 부호·임계값 (추정치 — 반드시 스윕)
+labels:
+  steering_sign_check: true          # 양수=좌회전, ECEF 헤딩 상관으로 매 실행 검증
+  stop_speed_mps: 0.5                 # STOPPED 기준
+  accel_threshold_mps2: 0.3          # ±: ACCEL/DECEL
+  steer_threshold_deg: 1.0           # ±: LEFT/RIGHT — 스윕 대상 (중위수 0.4°, p90 1.2°)
+  sweep:
+    steer_threshold_deg: [0.5, 0.8, 1.0, 1.2, 1.5]
+    accel_threshold_mps2: [0.2, 0.3, 0.4]
+
+# 모델 경로 (경량 우선 — 60분 예산)
+model:
+  path: optical_flow_baseline         # A: 플로우 통계 → 임계값 (학습 없이 강건)
+  alt_paths: [posenet_features, x3d_s_multitask]
+  weights: null                       # 오프라인
+
+# 데이터
+data:
+  source: data/external/comma2k19     # 라벨 원천 (schafer2018comma2k19, MIT)
+  label_csv: data/stage3/labels_comma2k19.csv
+  expand_full_dataset: false          # true 시 ~100GB → ~120만 행
+  class_balance: true                 # STRAIGHT 편중 대응
+
+# 제출 규약 (docs/03)
+submit:
+  stopped_needs_steer_label: true     # STOPPED 프레임도 steer_label 필수 (기본 STRAIGHT)

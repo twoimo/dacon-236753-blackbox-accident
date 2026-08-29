@@ -1,0 +1,39 @@
+# Stage 1 — 재녹화 판별 실험 설정
+# 근거: research/01-stage1-recapture/README.md
+# 상속: common.yaml
+
+stage: 1
+task: recapture_binary_classification
+primary_metric: macro_f1        # 높을수록 좋음
+secondary_metrics: [lodo_macro_f1]   # leave-one-device-out (진짜 지표)
+
+# 백본: 잔차 + 시간 2-스트림 (research 근거)
+model:
+  backbone: x3d_s               # x3d_s | mvit_v2_s (weights=None, 가중치 동봉)
+  clip_len: 16                  # 8~16 프레임 시공간 창
+  residual_stream:
+    enabled: true
+    init: laplacian             # conv1 고정 고역통과 (yang2017laplacian)
+  fft_head:
+    enabled: false              # 켤 땐 작게 — 단일 합성 주파수 암기 방지
+
+# 재촬영 합성 파이프라인 (물리 우선)
+recapture_synthesis:
+  tier: 2                       # 1=물리촬영, 2=광학시뮬, 3=단순오버레이(금지)
+  randomize_per_clip: true      # 격자 주파수·위상 클립마다 랜덤화
+  effects: [subpixel_grid, gamma, homography, lens_mtf, sensor_noise, refresh_beat]
+  include_hard_positives: true  # OLED/디포커스/약한 디모아레
+
+# 코덱 누설 차단 (최우선) — 두 클래스 동일 랜덤 재인코딩
+reencode:
+  apply_to_both_classes: true   # 필수. 라벨이 코덱과 상관되지 않게
+  codecs: [libx264, mpeg4]
+  crf_range: [18, 30]
+  gop_range: [10, 50]
+  forbid_metadata_features: true  # 비트레이트/profile/파일크기를 입력으로 금지
+
+# 검증 프로토콜
+validation:
+  split_by: source_video_id     # 프레임 랜덤 split 금지 (누설)
+  holdout_devices: 1            # 최소 1 화면 + 1 카메라 홀드아웃
+  calibration_set: official_stage1_samples

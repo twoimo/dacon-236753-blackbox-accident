@@ -1,0 +1,39 @@
+# 공통 실험 설정 (모든 Stage 상속)
+# 근거: research/04-backbones-and-constraints/README.md, docs/03-evaluation-and-submission.md
+
+seed: 42
+
+device:
+  # check_env.py가 자동 판별. cuda가 없으면 전처리/후처리만 실행되고 모델 단계는 skip.
+  prefer: cuda            # cuda | cpu | mps
+  amp: true               # 혼합정밀 (fp16) — L40S 처리량 확보
+  channels_last: true
+  torch_compile: false    # torch 2.8 안정화 후 true 검토
+
+# 평가 서버 제약 (docs/03) — 하니스가 이 예산을 넘으면 checks_failed
+constraints:
+  gpu: "NVIDIA L40S"
+  vram_gib: 44.7
+  vcpu: 7
+  ram_gb: 60
+  shm_gb: 30
+  infer_time_budget_min: 60      # 3-Stage 합산 추론 상한
+  install_time_budget_min: 10
+  submit_zip_gb: 10
+  unpacked_gb: 32
+  offline: true                  # 인터넷 차단 → weights=None + 가중치 동봉
+
+# 오프라인 규약 (docs/03 §3)
+weights:
+  auto_download: false           # 절대 True 금지 (평가서버 인터넷 차단)
+  load_from: model/              # submit.zip 내부 로컬 경로
+
+paths:
+  data_root: data
+  catalog: catalog/catalog.json
+  model_out: model
+
+logging:
+  # 하니스 출력 규약: 성공 시 exit 0 + 최소 1개 METRIC 라인
+  metric_prefix: "METRIC"
+  learning_prefix: "ASI"
